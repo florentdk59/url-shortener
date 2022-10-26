@@ -179,3 +179,9 @@ Dans UrlShortenerController.decodeShortUrl, si on voulait faire une vraie redire
         httpServletResponse.setHeader("Location", urlShortenerService.getOriginalUrlForShortUrlToken(shortUrlToken));
         httpServletResponse.setStatus(302);
     }
+
+### Chiffrement Jasypt
+
+Normalement je ne le mettrais pas dans un readme, mais pour l'exercice, sachez que la clef JASYPT de chiffrement utilisée dans application-prod.yml est : 
+
+    -Djasypt.encryptor.password=notarius
