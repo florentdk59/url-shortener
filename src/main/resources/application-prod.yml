@@ -1,0 +1,23 @@
+# PRODUCTION environment
+
+# database configuration
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/urlshortener
+    username: ENC(sFVJK5tjU4LmG1KLtSa29ht5l/9EdDW2XBAOgDr8/gMQ7NR3LJl2Iee3Wq9AQYSY)
+    password: ENC(Yb3qs2cnu/p18mzSm/Q+EyvBiKPkG5W5HgjkypC6pcDO2C6cp7yW/iedPLA7Hcs/)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+  h2:
+    console:
+      enabled: false
+
+# urlshortener configuration
+urlshortener:
+  baseurl: http://FLORENT-PC:8080/
+  token:
+    length: 10
+    characters: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+    maxattempts: 5
