@@ -1,15 +1,15 @@
 # url-shortener : Getting started
 
 ## Requis
-- java oracle jdk-19
+- java oracle jdk-21
 - apache-maven-3.8.6
-- Spring Boot 3.0.0-RC1
+- Spring Boot 3.4.1
 - H2 embedded database
 - MySQL 8.0.31
 
 Ce projet a été développé en utilisant également l'environnement suivant :
 - Windows 10
-- IntelliJ IDEA Community 2022.1.4
+- IntelliJ IDEA Community 2024.3
 - MySQL Workbench 8.0
 - PostMan 7.36.7
 - Sonarqube Community 9.7
@@ -120,7 +120,7 @@ Jasypt est utilisé pour chiffrer des valeurs sensibles dans les fichiers de con
 
 ### Créer une valeur chiffrée
 
-Pour créer une nouvelle valeur chiffrer, il faut utiliser la commande maven suivante : 
+Pour créer une nouvelle valeur chiffrée, il faut utiliser la commande maven suivante : 
 
     mvn jasypt:encrypt-value -Djasypt.encryptor.password=THE_PASSWORD -Djasypt.plugin.value=THE_VALUE_YOU_WANT_TO_ENCRYPT
 
