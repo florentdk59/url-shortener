@@ -36,9 +36,9 @@ Voici une description de l'API rest pour url-shortener :
 
 #### Request
 
-`POST /`
-{ "url" : ${url} }<br/>
-${url} = BODY PARAMETER = l'url complète pour laquelle on souhaite obtenir une url courte.
+`POST /`<br/>
+{ "url" : #URL# }<br/>
+#URL# (body parameter) = l'url complète pour laquelle on souhaite obtenir une url courte.
 
     curl -X POST http://localhost:8080/ -H 'Content-Type: application/json' -d '{"url":"https://www.journaldemontreal.com/5-minutes"}'
 
@@ -55,8 +55,8 @@ ${url} = BODY PARAMETER = l'url complète pour laquelle on souhaite obtenir une 
 
 #### Request
 
-`GET /${token}`<br/>
-${token} = PATH parameter = le jeton unique qui constitue une url courte.
+`GET /#TOKEN#`<br/>
+#TOKEN# (path parameter) = le jeton unique qui constitue une url courte.
 
     curl -i -H 'Accept: application/json' http://localhost:8080/YRIbFjrhPL
 
@@ -136,9 +136,10 @@ Pour rappel, si des valeurs chiffrées sont utiliseés dans application.yml (com
 ## Notes
 
 Dans la notion d'url courte, on va nommer "jeton" (token) la partie qui est après le domaine et après le chemin du endpoint (/), et qui consitue l'identifiant unique de l'url courte.
+Et on a fait le choix que le jeton ne sera jamais plus que 10 caractères.
 
 ### Génération du jeton pour l'url courte
-J'ai eu plusieurs idées pour créer l'url courte 
+Sachant que la préoccupation principale était la gestion d'une collision du jeton, j'ai eu plusieurs idées pour créer l'url courte. 
 
 #### utiliser une clé de hashage?
 Pour une clé de hashage, j'ai rejeté l'idée car, selon l'algorithme de hashage, plusieurs valeurs originales différentes pourraient donner la même clé de hashage. Et selon l'algorithme de hashage, nous dépasserions le nombre de caractères maximum pour le "jeton" dans l'url courte.
