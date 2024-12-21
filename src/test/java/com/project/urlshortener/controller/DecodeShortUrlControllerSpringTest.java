@@ -133,7 +133,7 @@ public class DecodeShortUrlControllerSpringTest {
 		}
 
 		@Test
-		@DisplayName("GET / : when a blank token is passed as a parameter, then httpStatus is BAD REQUET, and error is error.shorturl.InvalidToken")
+		@DisplayName("GET / : when a blank token is passed as a parameter, then httpStatus is BAD REQUEST, and error is error.shorturl.InvalidToken")
 		void decodeShortUrl_error_TokenBlank() {
 			given_shortUrlToken("    ");
 

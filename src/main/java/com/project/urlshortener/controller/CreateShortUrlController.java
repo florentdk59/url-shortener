@@ -7,8 +7,8 @@ import com.project.urlshortener.model.api.createshorturl.UrlShortenerCreateShort
 import com.project.urlshortener.model.api.createshorturl.UrlShortenerCreateShortUrlResponse;
 import com.project.urlshortener.service.UrlShortenerService;
 import jakarta.validation.Valid;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/")
 @Validated
+@Slf4j
 public class CreateShortUrlController extends AbstractCommonController {
-
-	private static final Logger LOGGER = LogManager.getLogger(CreateShortUrlController.class);
 
 	/** Services for reading and creating short url tokens. */
 	private final UrlShortenerService urlShortenerService;
@@ -82,7 +81,7 @@ public class CreateShortUrlController extends AbstractCommonController {
 
 	@Override
 	protected Logger getLogger() {
-		return LOGGER;
+		return log;
 	}
 
 	@Override

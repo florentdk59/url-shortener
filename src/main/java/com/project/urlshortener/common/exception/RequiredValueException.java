@@ -1,8 +1,6 @@
 package com.project.urlshortener.common.exception;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.FieldError;
@@ -18,8 +16,7 @@ import java.util.stream.Stream;
  * This exception contains a basic description of the field name (fieldName) that fails, and what requirement made it fail (RequirementType).
  * This exception is a RuntimeException.
  */
-@Data
-@Setter(AccessLevel.NONE)
+@Getter
 public class RequiredValueException extends RuntimeException implements ExceptionWithMessageKey {
 
     private static final String MESSAGE_KEY = "error.required.%s";
@@ -57,6 +54,7 @@ public class RequiredValueException extends RuntimeException implements Exceptio
      * An enum for the requirement involved in argument utils.<br/>
      * This is the reason why the RequiredValueException was thrown.
      */
+    @Getter
     public enum RequirementType {
         INVALID_FIELD("InvalidField"),
         CANNOT_BE_NULL("NotNull"),
@@ -69,10 +67,6 @@ public class RequiredValueException extends RuntimeException implements Exceptio
 
         RequirementType(String errorKey) {
             this.errorKey = errorKey;
-        }
-
-        public String getErrorKey() {
-            return this.errorKey;
         }
 
         /**
@@ -123,7 +117,7 @@ public class RequiredValueException extends RuntimeException implements Exceptio
 
     private static ObjectError getObjectErrorFromMethodArgumentNotValidException(final MethodArgumentNotValidException manve) {
         if (manve.getBindingResult() != null && !CollectionUtils.isEmpty(manve.getBindingResult().getAllErrors())) {
-            return manve.getBindingResult().getAllErrors().get(0);
+            return manve.getBindingResult().getAllErrors().getFirst();
         }
         return null;
     }
