@@ -5,12 +5,11 @@ import com.project.urlshortener.exception.ShortUrlTokenAlreadyUsedException;
 import com.project.urlshortener.exception.ShortUrlTokenCannotBeCreatedException;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
 import com.project.urlshortener.model.properties.UrlShortenerProperties;
+import com.project.urlshortener.repository.ShortUrlDao;
 import com.project.urlshortener.repository.ShortUrlRepository;
 import com.project.urlshortener.service.StringTokenService;
-import com.project.urlshortener.repository.ShortUrlDao;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -20,9 +19,8 @@ import org.springframework.stereotype.Service;
  * Implementation of ShortUrlDao.
  */
 @Service
+@Slf4j
 public class ShortUrlDaoImpl implements ShortUrlDao {
-
-    private static final Logger LOGGER = LogManager.getLogger(ShortUrlDaoImpl.class);
 
     /**
      * Access to some of the application parameters.
@@ -80,7 +78,7 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
     }
 
     /**
-     * Creates a brand new token for an original url value and saves a ShortUrlEntity in the database.<br/>
+     * Creates a brand-new token for an original url value and saves a ShortUrlEntity in the database.<br/>
      * Double checks if the newly created token is already used in the database. If it is already used, the method will fail with ShortUrlTokenAlreadyUsedException.<br/>
      * If the newly created token is null or empty, the method will fail with ShortUrlTokenCannotBeCreatedException.<br/>
      * This method will retry a couple of times (see maxAttemptsExpression) if it fails with any exception.<br/>
@@ -93,16 +91,16 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
     public ShortUrlEntity createNewShortUrlEntityRetryable(final String originalUrl) {
         String shortUrlToken = stringTokenService.createStringToken(urlShortenerProperties.getUrlshortenerTokenCharacters(), urlShortenerProperties.getUrlshortenerTokenLength());
         if (StringUtils.isBlank(shortUrlToken)) {
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn(String.format("createNewShortUrlEntityRetryable : for originalUrl[%s] the token was null empty or blank [%s]", originalUrl, shortUrlToken));
+            if (log.isWarnEnabled()) {
+                log.warn("createNewShortUrlEntityRetryable : for originalUrl[{}] the token was null empty or blank [{}]", originalUrl, shortUrlToken);
             }
             throw new ShortUrlTokenCannotBeCreatedException(originalUrl);
         }
 
         if (urlTokensRepository.findByToken(shortUrlToken) != null) {
             // token already taken
-            if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn(String.format("createNewShortUrlEntityRetryable : for originalUrl[%s] the token [%s] was already taken", originalUrl, shortUrlToken));
+            if (log.isWarnEnabled()) {
+                log.warn("createNewShortUrlEntityRetryable : for originalUrl[{}] the token [{}] was already taken", originalUrl, shortUrlToken);
             }
             throw new ShortUrlTokenAlreadyUsedException(shortUrlToken, originalUrl);
         }

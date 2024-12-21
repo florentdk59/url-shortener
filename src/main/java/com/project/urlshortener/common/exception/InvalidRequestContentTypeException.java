@@ -1,15 +1,12 @@
 package com.project.urlshortener.common.exception;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import lombok.Getter;
 
 /**
  * An Exception for a content type is rejected in a request.<br/>
  * This exception is a RuntimeException.
  */
-@Data
-@Setter(AccessLevel.NONE)
+@Getter
 public class InvalidRequestContentTypeException extends RuntimeException implements ExceptionWithMessageKey {
 
     private static final String INVALID_CONTENT_TYPE = "error.rest.content.type";

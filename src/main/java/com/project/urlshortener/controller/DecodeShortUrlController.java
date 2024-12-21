@@ -6,10 +6,9 @@ import com.project.urlshortener.exception.ShortUrlInvalidTokenException;
 import com.project.urlshortener.exception.ShortUrlTokenNotFoundException;
 import com.project.urlshortener.model.api.decodeshorturl.UrlShortenerDecodeShortUrlResponse;
 import com.project.urlshortener.service.UrlShortenerService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -23,9 +22,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/")
 @Validated
+@Slf4j
 public class DecodeShortUrlController extends AbstractCommonController {
 
-	private static final Logger LOGGER = LogManager.getLogger(DecodeShortUrlController.class);
 
 	/** Services for reading and creating short url tokens. */
 	private final UrlShortenerService urlShortenerService;
@@ -54,7 +53,7 @@ public class DecodeShortUrlController extends AbstractCommonController {
 	 * @throws ShortUrlInvalidTokenException If the token is empty or invalid, a ShortUrlInvalidTokenException will be thrown.
 	 */
 	@GetMapping("/{short-url-token}")
-	public ResponseEntity<UrlShortenerDecodeShortUrlResponse> decodeShortUrl(final @PathVariable("short-url-token") @NotBlank String shortUrlToken) throws ShortUrlTokenNotFoundException, ShortUrlInvalidTokenException {
+	public ResponseEntity<UrlShortenerDecodeShortUrlResponse> decodeShortUrl(final @PathVariable("short-url-token") String shortUrlToken) throws ShortUrlTokenNotFoundException, ShortUrlInvalidTokenException {
 
 		String originalUrl = urlShortenerService.getOriginalUrlForShortUrlToken(shortUrlToken);
 		return ResponseEntity.ok(
@@ -106,7 +105,7 @@ public class DecodeShortUrlController extends AbstractCommonController {
 
 	@Override
 	protected Logger getLogger() {
-		return LOGGER;
+		return log;
 	}
 
 	@Override

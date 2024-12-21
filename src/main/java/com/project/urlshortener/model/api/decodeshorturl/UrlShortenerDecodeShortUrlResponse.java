@@ -3,6 +3,7 @@ package com.project.urlshortener.model.api.decodeshorturl;
 import com.project.urlshortener.common.model.RestBasicResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -10,6 +11,7 @@ import lombok.experimental.SuperBuilder;
  * The JSON response for when you wanted to read a short url and retrieves its original complete url.<br/>
  * The response contains the original complete url.
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

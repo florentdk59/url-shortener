@@ -80,7 +80,7 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
     /**
      * Obtains a short url token for an original url.<br/>
      * It will try to find an already existing short url token for an original url.<br/>
-     * If it cannot find one, it will trigger the creation of a brand new token.<br/>
+     * If it cannot find one, it will trigger the creation of a brand-new token.<br/>
      * Can throw ShortUrlTokenCannotBeCreatedException if the token cannot be created for technical issues.
      *
      * @param originalUrl the complete url for which we want a short url token.
@@ -129,7 +129,7 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
     }
 
     /**
-     * Verifies wheteher a token is valid or not.
+     * Verifies whether a token is valid or not.
      *
      * @param token the tested token.
      * @return true if the url is not null, not empty, not blank, false it is.

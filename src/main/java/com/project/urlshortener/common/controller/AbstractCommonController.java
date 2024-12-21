@@ -5,7 +5,7 @@ import com.project.urlshortener.common.exception.InvalidJsonBodyException;
 import com.project.urlshortener.common.exception.InvalidRequestContentTypeException;
 import com.project.urlshortener.common.exception.RequiredValueException;
 import com.project.urlshortener.common.model.RestBasicResponse;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -79,7 +79,7 @@ public abstract class AbstractCommonController {
 	@ResponseBody
 	public RestBasicResponse onRequiredValueException(final RequiredValueException rve) {
 		if (getLogger() != null && getLogger().isErrorEnabled()) {
-			getLogger().error(String.format("An unexpected RequiredValueException has occurred : %s", rve), rve);
+			getLogger().error("An unexpected RequiredValueException has occurred", rve);
 		}
 		// get error message from RequiredValueException and from the localized messages
 		return handleExceptionWithLocalizedMessage(rve);
@@ -112,7 +112,7 @@ public abstract class AbstractCommonController {
 	public RestBasicResponse onUnexpectedError(final Throwable t) {
 		// default behaviour for an unexpected error
 		if (getLogger() != null && getLogger().isErrorEnabled()) {
-			getLogger().error(String.format("An error has occurred : %s", t), t);
+			getLogger().error("An error has occurred", t);
 		}
 		return RestBasicResponse.builder().success(false).error(String.format("An unexpected error has occurred : %s", t)).build();
 	}
@@ -143,7 +143,7 @@ public abstract class AbstractCommonController {
 			return messageSource.getMessage(error.getMessageKey(), error.getMessageArguments(), LocaleContextHolder.getLocale());
 		} catch(Exception e) {
 			if (getLogger() != null && getLogger().isErrorEnabled()) {
-				getLogger().error(String.format("Could not find message string for [%s] : %s", error.getMessageKey(), e));
+				getLogger().error("Could not find message string for [{}]", error.getMessageKey(), e);
 			}
 			return error.toString();
 		}

@@ -1,6 +1,7 @@
 package com.project.urlshortener.common.utils;
 
 import com.project.urlshortener.common.exception.RequiredValueException;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -8,14 +9,8 @@ import org.apache.commons.lang3.StringUtils;
  * These validations can all trigger an RequiredValueException if the tested condition is not met.<br/>
  * These validations are meant to be used to handle unexpected bad values in the code only.
  */
+@UtilityClass
 public class ArgumentUtils {
-
-    /**
-     * This class only offers static functions and does not need to be instanciated.
-     */
-    private ArgumentUtils() {
-        // NOOP
-    }
 
     /**
      * Requires an object to be not null.<br/>
