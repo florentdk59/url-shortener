@@ -38,7 +38,7 @@ Voici une description de l'API rest pour url-shortener :
 
 `POST /`<br/>
 { "url" : #URL# }<br/>
-#URL# (body parameter) = l'url complète pour laquelle on souhaite obtenir une url courte.
+#URL# (body parameter) = l'URL complète pour laquelle on souhaite obtenir une URL courte.
 
     curl -X POST http://localhost:8080/ -H 'Content-Type: application/json' -d '{"url":"https://www.journaldemontreal.com/5-minutes"}'
 
@@ -56,7 +56,7 @@ Voici une description de l'API rest pour url-shortener :
 #### Request
 
 `GET /#TOKEN#`<br/>
-#TOKEN# (path parameter) = le jeton unique qui constitue une url courte.
+#TOKEN# (path parameter) = le jeton unique qui constitue une URL courte.
 
     curl -i -H 'Accept: application/json' http://localhost:8080/YRIbFjrhPL
 
@@ -74,12 +74,12 @@ Voici une description de l'API rest pour url-shortener :
 
 ### Profils Spring
 Il y a deux profils Spring:
-- default : c'est le profil de développement pour le projet, qui utilise une base de données H2 embarquée, et les urls générées ont le baseurl localhost:8080 
-- prod : c'est le profil de "production" pour le projet, qui utilise une base de données MySql séparée, et les urls générées ont le baseurl FLORENT-PC:8080 (note : on pourrait imaginer un vrai nom de domaine ici)
+- default : c'est le profil de développement pour le projet, qui utilise une base de données H2 embarquée, et les URL générées ont le baseurl localhost:8080 
+- prod : c'est le profil de "production" pour le projet, qui utilise une base de données MySql séparée, et les URL générées ont le baseurl FLORENT-PC:8080 (note : on pourrait imaginer un vrai nom de domaine ici)
 
 ### Base de données
 
-En environnement de développement, la base de données est la base embarquée H2 qui démarre automatiquement avec spring-boot. La base est persistente dans un fichier sur le serveur.
+En environnement de développement, la base de données est la base embarquée H2 qui démarre automatiquement avec spring-boot. La base est persistante dans un fichier sur le serveur.
 
 En environnement de "production", la base de données utilisée est MySQL 8.0.31. Les paramètres de connexion à la base de données sont dans application-prod.yml (voir spring.datasource.url.username)
 
@@ -135,45 +135,45 @@ Pour rappel, si des valeurs chiffrées sont utiliseés dans application.yml (com
 
 ## Notes
 
-Dans la notion d'url courte, on va nommer "jeton" (token) la partie qui est après le domaine et après le chemin du endpoint (/), et qui consitue l'identifiant unique de l'url courte.
+Dans la notion d'URL courte, on va nommer "jeton" (token) la partie qui est après le domaine et après le chemin de l'endpoint (/), et qui constitue l'identifiant unique de l'URL courte.
 Et on a fait le choix que le jeton ne sera jamais plus que 10 caractères.
 
-### Génération du jeton pour l'url courte
-Sachant que la préoccupation principale était la gestion d'une collision du jeton, j'ai eu plusieurs idées pour créer l'url courte. 
+### Génération du jeton pour l'URL courte
+Sachant que la préoccupation principale était la gestion d'une collision du jeton, j'ai eu plusieurs idées pour créer l'URL courte. 
 
-#### utiliser une clé de hashage?
-Pour une clé de hashage, j'ai rejeté l'idée car, selon l'algorithme de hashage, plusieurs valeurs originales différentes pourraient donner la même clé de hashage. Et selon l'algorithme de hashage, nous dépasserions le nombre de caractères maximum pour le "jeton" dans l'url courte.
+#### utiliser une clé de hashage ?
+Pour une clé de hashage, j'ai rejeté l'idée car, selon l'algorithme de hashage, plusieurs valeurs originales différentes pourraient donner la même clé de hashage. Et selon l'algorithme de hashage, nous dépasserions le nombre de caractères maximum pour le "jeton" dans l'URL courte.
 
-#### utiliser une séquence numérique?
+#### utiliser une séquence numérique ?
 Pour une séquence numérique, on aurait 10 milliards de permutations, de 0000000000 à 9999999999, mais il serait alors possible de prédire les urls courtes. De plus, une perspective d'une limite à 10 millards n'est peut-être pas assez.
 
-#### utiliser des caractères aléatoires?
+#### utiliser des caractères aléatoires ?
 Pour utiliser des caractères aléatoires, en utilisant les lettres de a à z en minuscules, les lettres de A à Z en majuscules, et les 10 chiffres de 0 à 9, on a 62 caractères disponibles, et avec 10 caractètres dans le jeton on arrive à 62^10 permutations, soit 839 299 365 868 340 224 permutations possibles, soit largement plus que l'option 2.
 Par contre, l'inconvénient évident est que, si on génère un jeton complètement au hasard, il reste la possibilité, bien que relativement peu probable, de générer un jeton déjà utilisé!
 Ceci nous oblige donc à systématiquement vérifier si le jeton est déjà utilisé, et à en générer un autre. 
 
 #### Choix technique : caractères aléatoires
-J'ai choisi de garder la stratégie des caractères aléatoires car elle présentait la meilleure fiabilité pour cet exercice.
+J'ai choisi de garder la stratégie des caractères aléatoires, car elle présentait la meilleure fiabilité pour cet exercice.
 
 Les caractères utilisés pour les caractères aléatoires sont paramétrés dans application.yml dans :
 
     urlshortener.token.characters
 
-Le nombre de caractères utilisés pour le jeton est paramétré (défaut 10)  dans application.yml dans :
+Le nombre de caractères utilisés pour le jeton est paramétré (défaut 10) dans application.yml dans :
 
     urlshortener.token.length
 
-Si la génération du jeton créé un jeton qui se trouve être déjà utilisé dans la base données, alors une erreur est déclenché, mais sprin-retry permet au code de réessayer jusqu'à 5 fois.
-Le nombre de tentatives est paramétré (défaut 5)  dans application.yml dans :
+Si la génération du jeton créé un jeton qui se trouve être déjà utilisé dans la base de données, alors une erreur est déclenchée, mais spring-retry permet au code de réessayer jusqu'à 5 fois.
+Le nombre de tentatives est paramétré (défaut 5) dans application.yml dans :
 
     urlshortener.token.maxattempts
 
-Risque : si on changait ces paramètres, on pourrait créer une situation problématique pour l'application. Par exemple, si on réduisait le choix de caractères, ou si on réduisait la taille du jeton.
+Risque : si on changeait ces paramètres, on pourrait créer une situation problématique pour l'application. Par exemple, si on réduisait le choix de caractères, ou si on réduisait la taille du jeton.
 Le système est prévu pour réessayer 5 fois (paramétré dans application.yml) en cas de génération d'un jeton déjà utilisé. Si l'application ne parvient pas du tout à créer un jeton unique, en dépit des tentatives d'essai, la requête se terminera avec un message d'erreur.
 
 ### Redirection HTTP
 
-Dans UrlShortenerController.decodeShortUrl, si on voulait faire une vraie redirection http (plutôt que de simplement renvoyer l'url originale en réponse), on pourrait écrire quelque chose comme :
+Dans UrlShortenerController.decodeShortUrl, si on voulait faire une vraie redirection http (plutôt que de simplement renvoyer l'URL originale en réponse), on pourrait écrire quelque chose comme :
 
     @RequestMapping(value = "/{short-url-token}", method = RequestMethod.GET)
     public void decodeShortUrl(HttpServletResponse httpServletResponse, final @PathVariable("short-url-token") @NotBlank String shortUrlToken) throws ShortUrlTokenNotFoundException {
