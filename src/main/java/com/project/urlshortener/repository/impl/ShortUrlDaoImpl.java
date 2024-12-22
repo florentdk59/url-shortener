@@ -1,10 +1,10 @@
 package com.project.urlshortener.repository.impl;
 
 import com.project.urlshortener.common.utils.ArgumentUtils;
+import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.project.urlshortener.exception.ShortUrlTokenAlreadyUsedException;
 import com.project.urlshortener.exception.ShortUrlTokenCannotBeCreatedException;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
-import com.project.urlshortener.model.properties.UrlShortenerProperties;
 import com.project.urlshortener.repository.ShortUrlDao;
 import com.project.urlshortener.repository.ShortUrlRepository;
 import com.project.urlshortener.service.StringTokenService;
@@ -64,6 +64,7 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
         return urlTokensRepository.findByOriginalUrl(originalUrl);
     }
 
+
     /**
      * Creates a brand-new token for an original url value and saves a ShortUrlEntity in the database.<br/>
      * Double checks if the newly created token is already used in the database. If it is already used, the method will fail with ShortUrlTokenAlreadyUsedException.<br/>
@@ -74,15 +75,16 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
      * @param originalUrl the value of the original url.
      * @return the ShortUrlEntity created in the database.
      */
-    @Retryable(maxAttemptsExpression = "#{@urlShortenerProperties.getUrlshortenerTokenMaxAttempts()}")
+    @Retryable(maxAttemptsExpression = "#{@shortUrlDaoImpl.getMaxRetryableAttempts()}")
     public ShortUrlEntity createNewShortUrlEntityRetryable(final String originalUrl) {
-        String shortUrlToken = stringTokenService.createStringToken(urlShortenerProperties.getUrlshortenerTokenCharacters(), urlShortenerProperties.getUrlshortenerTokenLength());
+        String shortUrlToken = stringTokenService.createStringToken(urlShortenerProperties.token().characters(), urlShortenerProperties.token().length());
         if (StringUtils.isBlank(shortUrlToken)) {
             if (log.isWarnEnabled()) {
                 log.warn("createNewShortUrlEntityRetryable : for originalUrl[{}] the token was null empty or blank [{}]", originalUrl, shortUrlToken);
             }
             throw new ShortUrlTokenCannotBeCreatedException(originalUrl);
         }
+        shortUrlToken = "aEb";
 
         if (urlTokensRepository.findByToken(shortUrlToken) != null) {
             // token already taken
@@ -94,6 +96,14 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
 
         // save new short url to the database
         return urlTokensRepository.save(ShortUrlEntity.builder().token(shortUrlToken).originalUrl(originalUrl).build());
+    }
+
+    /**
+     * A way to access the urlShortenerProperties from the SPEL used by createNewShortUrlEntityRetryable.
+     * @return number of maximum retryable attemps from the properties
+     */
+    public int getMaxRetryableAttempts() {
+        return urlShortenerProperties.token().maxAttempts();
     }
 
 }
