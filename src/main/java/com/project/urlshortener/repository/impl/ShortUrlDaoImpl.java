@@ -8,9 +8,9 @@ import com.project.urlshortener.model.properties.UrlShortenerProperties;
 import com.project.urlshortener.repository.ShortUrlDao;
 import com.project.urlshortener.repository.ShortUrlRepository;
 import com.project.urlshortener.service.StringTokenService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +19,9 @@ import org.springframework.stereotype.Service;
  * Implementation of ShortUrlDao.
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ShortUrlDaoImpl implements ShortUrlDao {
-
-    /**
-     * Access to some of the application parameters.
-     */
-    private final UrlShortenerProperties urlShortenerProperties;
-
-    /**
-     * Service to create tokens of characters.
-     */
-    private final StringTokenService stringTokenService;
 
     /**
      * Spring Data Repository for the SHORT_URL table.
@@ -38,18 +29,14 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
     private final ShortUrlRepository urlTokensRepository;
 
     /**
-     * Default constructor for ShortUrlDaoImpl.
-     *
-     * @param urlTokensRepository instance of ShortUrlRepository.
-     * @param stringTokenService instance of StringTokenService.
-     * @param urlShortenerProperties instance of UrlShortenerProperties.
+     * Service to create tokens of characters.
      */
-    @Autowired
-    public ShortUrlDaoImpl(final ShortUrlRepository urlTokensRepository, final StringTokenService stringTokenService, final UrlShortenerProperties urlShortenerProperties) {
-        this.urlTokensRepository = urlTokensRepository;
-        this.stringTokenService = stringTokenService;
-        this.urlShortenerProperties = urlShortenerProperties;
-    }
+    private final StringTokenService stringTokenService;
+
+    /**
+     * Access to some of the application parameters.
+     */
+    private final UrlShortenerProperties urlShortenerProperties;
 
     /**
      * Searches for a ShortUrlEntity in the database matching a specific token value.

@@ -2,14 +2,16 @@ package com.project.urlshortener.controller;
 
 import com.project.urlshortener.common.controller.AbstractCommonController;
 import com.project.urlshortener.common.model.RestBasicResponse;
-import com.project.urlshortener.exception.*;
+import com.project.urlshortener.exception.ShortUrlInvalidUrlException;
+import com.project.urlshortener.exception.ShortUrlTokenAlreadyUsedException;
+import com.project.urlshortener.exception.ShortUrlTokenCannotBeCreatedException;
 import com.project.urlshortener.model.api.createshorturl.UrlShortenerCreateShortUrlRequest;
 import com.project.urlshortener.model.api.createshorturl.UrlShortenerCreateShortUrlResponse;
 import com.project.urlshortener.service.UrlShortenerService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/")
 @Validated
+@RequiredArgsConstructor
 @Slf4j
 public class CreateShortUrlController extends AbstractCommonController {
 
@@ -30,18 +33,6 @@ public class CreateShortUrlController extends AbstractCommonController {
 
 	/** Access to the localized messages of the application. */
 	private final MessageSource messageSource;
-
-	/**
-	 * Default constructor for the UrlShortenerController.
-	 *
-	 * @param urlShortenerService instance of UrlShortenerService.
-	 * @param messageSource instance of MessageSource.
-	 */
-	@Autowired
-	public CreateShortUrlController(final UrlShortenerService urlShortenerService, final MessageSource messageSource) {
-		this.urlShortenerService = urlShortenerService;
-		this.messageSource = messageSource;
-	}
 
 	/**
 	 * Creates a short url for an original url.<br/>

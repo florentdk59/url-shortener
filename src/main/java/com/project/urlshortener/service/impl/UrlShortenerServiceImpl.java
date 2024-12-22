@@ -7,8 +7,8 @@ import com.project.urlshortener.model.properties.UrlShortenerProperties;
 import com.project.urlshortener.repository.ShortUrlDao;
 import com.project.urlshortener.service.UrlShortenerService;
 import io.micrometer.common.util.StringUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,6 +18,7 @@ import java.util.Optional;
  * Implements UrlShortenerService.
  */
 @Service
+@RequiredArgsConstructor
 public class UrlShortenerServiceImpl implements UrlShortenerService  {
 
     /** Access to some of the application parameters. */
@@ -29,19 +30,6 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
     /** Apache commons validation routines for URLs. */
     private final UrlValidator urlValidator;
 
-    /**
-     * Default constructor for UrlShortenerServiceImpl.
-     *
-     * @param urlShortenerProperties instance of UrlShortenerProperties.
-     * @param shortUrlDao instance of ShortUrlDao.
-     * @param urlValidator instance of UrlValidator.
-     */
-    @Autowired
-    public UrlShortenerServiceImpl(final UrlShortenerProperties urlShortenerProperties, final ShortUrlDao shortUrlDao, final UrlValidator urlValidator) {
-        this.urlShortenerProperties = urlShortenerProperties;
-        this.shortUrlDao = shortUrlDao;
-        this.urlValidator = urlValidator;
-    }
 
     @Override
     public String obtainShortUrlForOriginalCompleteUrl(final String originalUrl) throws ShortUrlInvalidUrlException {
