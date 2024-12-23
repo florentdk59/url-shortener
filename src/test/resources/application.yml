@@ -1,0 +1,20 @@
+# DEFAULT environment
+
+# database configuration
+spring:
+  datasource:
+    url: jdbc:h2:mem:db
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+# urlshortener configuration
+url-shortener:
+  baseurl: http://junit-hostname/
+  token:
+    length: 10
+    characters: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+    max-attempts: 5
