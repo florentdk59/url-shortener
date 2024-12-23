@@ -47,7 +47,6 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
 
     @Override
     public String obtainShortUrlForOriginalCompleteUrl(final String originalUrl) throws ShortUrlInvalidUrlException {
-        requireNonBlank(originalUrl, "originalUrl");
 
         // validate the url
         if (!isUrlValid(originalUrl)) {
