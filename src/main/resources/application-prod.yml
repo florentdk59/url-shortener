@@ -16,7 +16,7 @@ spring:
 
 # urlshortener configuration
 url-shortener:
-  baseurl: http://FLORENT-PC:8080/
+  baseurl: http://PRODUCTION-SERVER:8080/
   token:
     length: 10
     characters: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789

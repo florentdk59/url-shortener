@@ -74,14 +74,14 @@ Voici une description de l'API rest pour url-shortener :
 
 ### Profils Spring
 Il y a deux profils Spring:
-- default : c'est le profil de développement pour le projet, qui utilise une base de données H2 embarquée, et les URL générées ont le baseurl localhost:8080 
-- prod : c'est le profil de "production" pour le projet, qui utilise une base de données MySql séparée, et les URL générées ont le baseurl FLORENT-PC:8080 (note : on pourrait imaginer un vrai nom de domaine ici)
+- (default) : c'est le profil de développement pour le projet, qui utilise une base de données H2 embarquée, et les URL générées ont le baseurl localhost:8080 
+- prod : c'est un exemple de profil type "production" pour le projet, qui utiliserait une base de données MySql séparée, et les URL générées ont le baseurl PRODUCTION-SERVER:8080 (note : on pourrait imaginer un vrai nom de domaine ici)
 
 ### Base de données
 
 En environnement de développement, la base de données est la base embarquée H2 qui démarre automatiquement avec spring-boot. La base est persistante dans un fichier sur le serveur.
 
-En environnement de "production", la base de données utilisée est MySQL 8.0.31. Les paramètres de connexion à la base de données sont dans application-prod.yml (voir spring.datasource.url.username)
+En environnement de "production", la base de données utilisée est MySQL 8.0.31. Les paramètres de connexion à la base de données sont dans application-prod.yml et sont chiffrés avec jasypt (voir spring.datasource.url.username)
 
 #### SHORT_URL
 La table principale utilisée dans la base de données, pour lier un jeton avec une url est SHORT_URL.
