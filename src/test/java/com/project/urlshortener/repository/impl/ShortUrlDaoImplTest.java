@@ -1,58 +1,70 @@
-package com.project.urlshortener.repository;
+package com.project.urlshortener.repository.impl;
 
 import com.project.urlshortener.common.exception.RequiredValueException;
+import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.project.urlshortener.exception.ShortUrlTokenAlreadyUsedException;
 import com.project.urlshortener.exception.ShortUrlTokenCannotBeCreatedException;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
-import com.project.urlshortener.model.properties.UrlShortenerProperties;
-import com.project.urlshortener.repository.impl.ShortUrlDaoImpl;
+import com.project.urlshortener.repository.ShortUrlRepository;
 import com.project.urlshortener.service.StringTokenService;
+import com.project.urlshortener.utils.UrlShortenerPropertiesBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static com.project.urlshortener.utils.AssertionUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class ShortUrlDaoTest {
+@ExtendWith(MockitoExtension.class)
+public class ShortUrlDaoImplTest {
+
+    private UrlShortenerProperties urlShortenerProperties;
+    private static final ShortUrlEntity SHORT_URL_ABCD = ShortUrlEntity.builder().originalUrl("http://originalurl").token("abcd").build();
+
+    @Mock
+    private ShortUrlRepository mockUrlTokensRepository;
+    @Mock
+    private StringTokenService mockStringTokenService;
+
+    @InjectMocks
+    private ShortUrlDaoImpl shortUrlDaoImpl;
+
+    @BeforeEach
+    void setUp() {
+        urlShortenerProperties = new UrlShortenerPropertiesBuilder().buildSpy();
+        ReflectionTestUtils.setField(shortUrlDaoImpl, "urlShortenerProperties", urlShortenerProperties);
+    }
 
     @Nested
     @DisplayName("ShortUrlDao.findExistingShortUrlEntityByToken tests")
-    class CreateStringTokenTest {
+    class FindExistingShortUrlEntityByTokenTest {
         private String parameterToken;
         private ShortUrlEntity resultShortUrlEntity;
         private Exception caughtException;
 
-        @Mock
-        private ShortUrlRepository mockUrlTokensRepository;
-        @Mock
-        private StringTokenService mockStringTokenService;
-        @Mock
-        private UrlShortenerProperties mockUrlShortenerProperties;
-        private ShortUrlDao shortUrlDao;
-
-        private static final ShortUrlEntity SHORT_URL_ABCD = ShortUrlEntity.builder().originalUrl("http://originalurl").token("abcd").build();
-
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.openMocks(this);
             parameterToken = null;
             resultShortUrlEntity = null;
             caughtException = null;
-            shortUrlDao = new ShortUrlDaoImpl(mockUrlTokensRepository, mockStringTokenService, mockUrlShortenerProperties);
-
-            when(mockUrlTokensRepository.findByToken("abcd")).thenReturn(SHORT_URL_ABCD);
         }
 
         @Test
         @DisplayName("findExistingShortUrlEntityByToken : when token is passed as a parameter, then repository.findByToken should be called and should return result from repository")
         void findExistingShortUrlEntityByToken_shouldCallRepositoryFindByToken() {
             given_token("abcd");
+            given_short_url_found_for_token("abcd", SHORT_URL_ABCD);
 
             when_findExistingShortUrlEntityByToken();
 
@@ -60,6 +72,8 @@ public class ShortUrlDaoTest {
             then_repositoryFindByTokenIsCalled("abcd");
             then_resultShortUrlEntityIs(SHORT_URL_ABCD);
         }
+
+
 
         @Test
         @DisplayName("findExistingShortUrlEntityByToken : when token is null, then RequiredValueException")
@@ -95,9 +109,13 @@ public class ShortUrlDaoTest {
             this.parameterToken = token;
         }
 
+        private void given_short_url_found_for_token(final String token, final ShortUrlEntity shortUrl) {
+            when(mockUrlTokensRepository.findByToken(token)).thenReturn(shortUrl);
+        }
+
         private void when_findExistingShortUrlEntityByToken() {
             try {
-                resultShortUrlEntity = shortUrlDao.findExistingShortUrlEntityByToken(parameterToken);
+                resultShortUrlEntity = shortUrlDaoImpl.findExistingShortUrlEntityByToken(parameterToken);
             } catch(Exception e) {
                 caughtException = e;
             }
@@ -131,30 +149,18 @@ public class ShortUrlDaoTest {
         private ShortUrlEntity resultShortUrlEntity;
         private Exception caughtException;
 
-        @Mock
-        private ShortUrlRepository mockUrlTokensRepository;
-        @Mock
-        private StringTokenService mockStringTokenService;
-        @Mock
-        private UrlShortenerProperties mockUrlShortenerProperties;
-        private ShortUrlDao shortUrlDao;
-
-        private static final ShortUrlEntity SHORT_URL_ABCD = ShortUrlEntity.builder().originalUrl("http://originalurl").token("abcd").build();
-
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.openMocks(this);
             parameterOriginalUrl = null;
             resultShortUrlEntity = null;
             caughtException = null;
-            shortUrlDao = new ShortUrlDaoImpl(mockUrlTokensRepository, mockStringTokenService, mockUrlShortenerProperties);
-
-            when(mockUrlTokensRepository.findByOriginalUrl("http://originalurl")).thenReturn(SHORT_URL_ABCD);
         }
 
         @Test
         @DisplayName("findExistingShortUrlEntityByToken : when token is passed as a parameter, then repository.findByToken should be called and should return result from repository")
         void findExistingShortUrlEntityByOriginalUrl_shouldCallRepositoryFindByToken() {
+            when(mockUrlTokensRepository.findByOriginalUrl("http://originalurl")).thenReturn(SHORT_URL_ABCD);
+
             given_originalUrl("http://originalurl");
 
             when_findExistingShortUrlEntityByOriginalUrl();
@@ -200,7 +206,7 @@ public class ShortUrlDaoTest {
 
         private void when_findExistingShortUrlEntityByOriginalUrl() {
             try {
-                resultShortUrlEntity = shortUrlDao.findExistingShortUrlEntityByOriginalUrl(parameterOriginalUrl);
+                resultShortUrlEntity = shortUrlDaoImpl.findExistingShortUrlEntityByOriginalUrl(parameterOriginalUrl);
             } catch(Exception e) {
                 caughtException = e;
             }
@@ -238,34 +244,16 @@ public class ShortUrlDaoTest {
         private ShortUrlEntity resultShortUrlEntity;
         private Exception caughtException;
 
-        @Mock
-        private ShortUrlRepository mockUrlTokensRepository;
-        @Mock
-        private StringTokenService mockStringTokenService;
-        @Mock
-        private UrlShortenerProperties mockUrlShortenerProperties;
-        private ShortUrlDao shortUrlDao;
-
         @BeforeEach
         void setUp() {
-            MockitoAnnotations.openMocks(this);
-            parameterOriginalUrl = null;
-            resultShortUrlEntity = null;
-            caughtException = null;
-            shortUrlDao = new ShortUrlDaoImpl(mockUrlTokensRepository, mockStringTokenService, mockUrlShortenerProperties);
-
-            doAnswer(invocationOnMock -> {
-                ShortUrlEntity arg = invocationOnMock.getArgument(0);
-                return ShortUrlEntity.builder().id(15L).originalUrl(arg.getOriginalUrl()).token(arg.getToken()).build();
-            }).when(mockUrlTokensRepository).save(any(ShortUrlEntity.class));
-
-            when(mockUrlShortenerProperties.getUrlshortenerTokenCharacters()).thenReturn("abcd");
-            when(mockUrlShortenerProperties.getUrlshortenerTokenLength()).thenReturn(10);
+            urlShortenerProperties = new UrlShortenerPropertiesBuilder().withTokenCharacters("abcd").withTokenLength(10).buildSpy();
+            ReflectionTestUtils.setField(shortUrlDaoImpl, "urlShortenerProperties", urlShortenerProperties);
         }
 
         @Test
         @DisplayName("createNewShortUrlEntityRetryable : when token is passed as a parameter, then repository.findByToken should be called and should return result from repository")
         void createNewShortUrlEntityRetryable_shouldCallRepositoryFindByTokenAndShouldCallRepositorySave() {
+            using_mocked_urlTokensRepository_save();
             when(mockStringTokenService.createStringToken(anyString(), anyInt())).thenReturn("TOKEN");
             given_originalUrl("http://originalurl");
 
@@ -300,13 +288,20 @@ public class ShortUrlDaoTest {
             then_exceptionThrown(ShortUrlTokenAlreadyUsedException.class, "[originalUrl=http://originalurl,shortUrlToken=TOKEN]");
         }
 
+        private void using_mocked_urlTokensRepository_save() {
+            doAnswer(invocationOnMock -> {
+                ShortUrlEntity arg = invocationOnMock.getArgument(0);
+                return ShortUrlEntity.builder().id(15L).originalUrl(arg.getOriginalUrl()).token(arg.getToken()).build();
+            }).when(mockUrlTokensRepository).save(any(ShortUrlEntity.class));
+        }
+
         private void given_originalUrl(final String originalUrl) {
             this.parameterOriginalUrl = originalUrl;
         }
 
         private void when_createNewShortUrlEntityRetryable() {
             try {
-                resultShortUrlEntity = shortUrlDao.createNewShortUrlEntityRetryable(parameterOriginalUrl);
+                resultShortUrlEntity = shortUrlDaoImpl.createNewShortUrlEntityRetryable(parameterOriginalUrl);
             } catch(Exception e) {
                 caughtException = e;
             }
@@ -337,4 +332,18 @@ public class ShortUrlDaoTest {
         }
 
     }
+
+
+    @Nested
+    class GetMaxRetryableAttemptsTest {
+
+        @Test
+        void getMaxRetryableAttempts_shouldReadProperties() {
+            var result = shortUrlDaoImpl.getMaxRetryableAttempts();
+
+            verify(urlShortenerProperties.token()).maxAttempts();
+            assertThat(result).isEqualTo(urlShortenerProperties.token().maxAttempts());
+        }
+    }
+
 }
