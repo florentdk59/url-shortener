@@ -1,16 +1,13 @@
 package com.project.urlshortener.exception;
 
 import com.project.urlshortener.common.exception.ExceptionWithMessageKey;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * An Exception for when an url is invalid.
  */
-@Data
-@Setter(AccessLevel.NONE)
+@Getter
 public class ShortUrlInvalidUrlException extends Exception implements ExceptionWithMessageKey {
 
     private static final String MESSAGE_KEY_INVALID_URL = "error.shorturl.InvalidUrl";

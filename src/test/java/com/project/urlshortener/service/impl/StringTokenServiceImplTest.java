@@ -1,7 +1,7 @@
-package com.project.urlshortener.service;
+package com.project.urlshortener.service.impl;
 
 import com.project.urlshortener.common.exception.RequiredValueException;
-import com.project.urlshortener.service.impl.StringTokenServiceImpl;
+import com.project.urlshortener.service.StringTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;
 
-import static com.project.urlshortener.utils.AssertionUtils.*;
+import static com.project.urlshortener.utils.AssertionUtils.assertException;
+import static com.project.urlshortener.utils.AssertionUtils.assertNoException;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class StringTokenServiceTest {
+public class StringTokenServiceImplTest {
 
     @Nested
     @DisplayName("StringTokenService.createStringToken tests")

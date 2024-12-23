@@ -1,9 +1,9 @@
 package com.project.urlshortener.service.impl;
 
 import com.project.urlshortener.common.utils.ArgumentUtils;
+import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.project.urlshortener.exception.*;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
-import com.project.urlshortener.model.properties.UrlShortenerProperties;
 import com.project.urlshortener.repository.ShortUrlDao;
 import com.project.urlshortener.service.UrlShortenerService;
 import io.micrometer.common.util.StringUtils;
@@ -42,6 +42,7 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
         this.shortUrlDao = shortUrlDao;
         this.urlValidator = urlValidator;
     }
+
 
     @Override
     public String obtainShortUrlForOriginalCompleteUrl(final String originalUrl) throws ShortUrlInvalidUrlException {
@@ -88,8 +89,8 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
      */
     protected String findOrCreateShortUrlToken(final String originalUrl) {
         ArgumentUtils.requireNonBlank(originalUrl, "originalUrl");
-        ArgumentUtils.requireNonBlank(urlShortenerProperties.getUrlshortenerTokenCharacters(), "urlShortenerProperties.getUrlshortenerTokenCharacters()");
-        ArgumentUtils.requireStrictlyPositiveValue(urlShortenerProperties.getUrlshortenerTokenLength(), "urlShortenerProperties.getUrlshortenerTokenLength()");
+        ArgumentUtils.requireNonBlank(urlShortenerProperties.token().characters(), "urlShortenerProperties.token().characters()");
+        ArgumentUtils.requireStrictlyPositiveValue(urlShortenerProperties.token().length(), "urlShortenerProperties.token().length()");
 
         // search in the database for the token if it already exists for this url?
         // OR create a new token if there wasn't already one
@@ -109,9 +110,9 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
      */
     protected String buildShortUrlForToken(final String shortUrlToken) {
         ArgumentUtils.requireNonBlank(shortUrlToken, "shortUrlToken");
-        ArgumentUtils.requireNonBlank(urlShortenerProperties.getUrlShortenerBaseUrl(), "urlShortenerProperties.getUrlShortenerBaseUrl()");
+        ArgumentUtils.requireNonBlank(urlShortenerProperties.baseUrl(), "urlShortenerProperties.baseUrl()");
 
-        String baseUrl = urlShortenerProperties.getUrlShortenerBaseUrl();
+        String baseUrl = urlShortenerProperties.baseUrl();
         if (!baseUrl.endsWith("/")) {
             baseUrl += "/";
         }

@@ -6,10 +6,10 @@ import com.project.urlshortener.exception.ShortUrlInvalidTokenException;
 import com.project.urlshortener.exception.ShortUrlTokenNotFoundException;
 import com.project.urlshortener.model.api.decodeshorturl.UrlShortenerDecodeShortUrlResponse;
 import com.project.urlshortener.service.UrlShortenerService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/")
 @Validated
+@RequiredArgsConstructor
 @Slf4j
 public class DecodeShortUrlController extends AbstractCommonController {
 
@@ -31,18 +32,6 @@ public class DecodeShortUrlController extends AbstractCommonController {
 
 	/** Access to the localized messages of the application. */
 	private final MessageSource messageSource;
-
-	/**
-	 * Default constructor for the UrlShortenerController.
-	 *
-	 * @param urlShortenerService instance of UrlShortenerService.
-	 * @param messageSource instance of MessageSource.
-	 */
-	@Autowired
-	public DecodeShortUrlController(final UrlShortenerService urlShortenerService, final MessageSource messageSource) {
-		this.urlShortenerService = urlShortenerService;
-		this.messageSource = messageSource;
-	}
 
 	/**
 	 * Reads a short url token and tries to find the matching original url.<br/>

@@ -1,8 +1,8 @@
 package com.project.urlshortener.controller;
 
+import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.project.urlshortener.model.api.decodeshorturl.UrlShortenerDecodeShortUrlResponse;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
-import com.project.urlshortener.model.properties.UrlShortenerProperties;
 import com.project.urlshortener.repository.ShortUrlRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;

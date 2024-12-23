@@ -1,8 +1,8 @@
 package com.project.urlshortener.controller;
 
+import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.project.urlshortener.model.api.createshorturl.UrlShortenerCreateShortUrlResponse;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
-import com.project.urlshortener.model.properties.UrlShortenerProperties;
 import com.project.urlshortener.repository.ShortUrlRepository;
 import com.project.urlshortener.service.UrlShortenerService;
 import org.apache.commons.lang3.StringUtils;
