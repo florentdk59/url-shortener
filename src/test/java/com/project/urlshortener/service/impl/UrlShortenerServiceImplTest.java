@@ -2,7 +2,7 @@ package com.project.urlshortener.service.impl;
 
 import com.project.urlshortener.common.exception.RequiredValueException;
 import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
-import com.project.urlshortener.exception.ShortUrlTokenCannotBeCreatedException;
+import com.project.urlshortener.exception.*;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
 import com.project.urlshortener.repository.ShortUrlDao;
 import com.project.urlshortener.utils.UrlShortenerPropertiesBuilder;
@@ -50,6 +50,122 @@ public class UrlShortenerServiceImplTest {
                 .buildSpy();
         ReflectionTestUtils.setField(service, "urlShortenerProperties", urlShortenerProperties);
     }
+
+
+    @Nested
+    @DisplayName("UrlShortenerService.obtainShortUrlForOriginalCompleteUrl tests")
+    class ObtainShortUrlForOriginalCompleteUrlTest {
+
+        @Test
+        @DisplayName("obtainShortUrlForOriginalCompleteUrl : if short url does not already exist, then createNewShortUrlEntityRetryable is called and token and baseurl are combined to create the shorturl")
+        void obtainShortUrlForOriginalCompleteUrl_shouldCombineBaseUrlAndNewlyCreatedTokenToCreateShortUrl() throws ShortUrlInvalidUrlException {
+            when(mockUrlValidator.isValid("http://testurl")).thenReturn(true);
+            when(mockShortUrlDao.findExistingShortUrlEntityByOriginalUrl("http://testurl")).thenReturn(null);
+            when(mockShortUrlDao.createNewShortUrlEntityRetryable("http://testurl")).thenReturn(ShortUrlEntity.builder().originalUrl("http://originalurl").token("abcdef").build());
+
+            var resultShortUrl = service.obtainShortUrlForOriginalCompleteUrl("http://testurl");
+
+            assertThat(resultShortUrl).isNotNull().isEqualTo(BASE_URL + "abcdef");
+            verify(mockUrlValidator).isValid("http://testurl");
+            verify(mockShortUrlDao).findExistingShortUrlEntityByOriginalUrl("http://testurl");
+            verify(mockShortUrlDao).createNewShortUrlEntityRetryable("http://testurl");
+        }
+
+        @Test
+        @DisplayName("obtainShortUrlForOriginalCompleteUrl : if short url already exists for an url, then createNewShortUrlEntityRetryable is not called and already existing token and baseurl are combined to create the shorturl")
+        void obtainShortUrlForOriginalCompleteUrl_tokenAlreadyExists() throws ShortUrlInvalidUrlException {
+            when(mockUrlValidator.isValid("http://www.canada.ca/")).thenReturn(true);
+            when(mockShortUrlDao.findExistingShortUrlEntityByOriginalUrl("http://www.canada.ca/")).thenReturn(ShortUrlEntity.builder().originalUrl("http://originalurl").token("abcdef000").build());
+
+            var resultShortUrl = service.obtainShortUrlForOriginalCompleteUrl("http://www.canada.ca/");
+
+            assertThat(resultShortUrl).isNotNull().isEqualTo(BASE_URL + "abcdef000");
+            verify(mockUrlValidator).isValid("http://www.canada.ca/");
+            verify(mockShortUrlDao).findExistingShortUrlEntityByOriginalUrl("http://www.canada.ca/");
+            verify(mockShortUrlDao, never()).createNewShortUrlEntityRetryable(anyString());
+        }
+
+        @Test
+        @DisplayName("obtainShortUrlForOriginalCompleteUrl : if short url does not already exist but createNewShortUrlEntityRetryable fails, then ShortUrlInvalidUrlException")
+        void obtainShortUrlForOriginalCompleteUrl_error_urlIsInvalid() {
+            when(mockUrlValidator.isValid("http:badurl")).thenReturn(false);
+
+            assertThatThrownBy(() -> service.obtainShortUrlForOriginalCompleteUrl("http:badurl"))
+                    .isInstanceOf(ShortUrlInvalidUrlException.class)
+                            .hasFieldOrPropertyWithValue("url", "http:badurl");
+
+            verify(mockShortUrlDao, never()).findExistingShortUrlEntityByOriginalUrl(anyString());
+            verify(mockShortUrlDao, never()).createNewShortUrlEntityRetryable(anyString());
+        }
+
+        @Test
+        @DisplayName("obtainShortUrlForOriginalCompleteUrl : if short url does not already exist but createNewShortUrlEntityRetryable fails, then ShortUrlTokenCannotBeCreatedException")
+        void obtainShortUrlForOriginalCompleteUrl_error_newTokenFailure() {
+            when(mockUrlValidator.isValid("http://www.google.com/")).thenReturn(true);
+            when(mockShortUrlDao.findExistingShortUrlEntityByOriginalUrl("http://www.google.com/")).thenReturn(null);
+            when(mockShortUrlDao.createNewShortUrlEntityRetryable("http://www.google.com/"))
+                    .thenThrow(new ShortUrlTokenAlreadyUsedException("error", "http://www.google.com/"));
+
+            assertThatThrownBy(() -> service.obtainShortUrlForOriginalCompleteUrl("http://www.google.com/"))
+                    .isInstanceOf(ShortUrlTokenCannotBeCreatedException.class)
+                    .hasFieldOrPropertyWithValue("originalUrl", "http://www.google.com/");
+        }
+
+
+    }
+
+
+    @Nested
+    @DisplayName("UrlShortenerService.getOriginalUrlForShortUrlToken tests")
+    class GetOriginalUrlForShortUrlTokenTest {
+
+        @Test
+        @DisplayName("getOriginalUrlForShortUrlToken : if short url already exists, then findExistingShortUrlEntityByToken is called and original url is returned")
+        void getOriginalUrlForShortUrlToken_shouldCombineBaseUrlAndNewlyCreatedTokenToCreateShortUrl() throws ShortUrlInvalidTokenException, ShortUrlTokenNotFoundException {
+            when(mockShortUrlDao.findExistingShortUrlEntityByToken("abcdef")).thenReturn(ShortUrlEntity.builder().originalUrl("http://originalurl").token("abcdef").build());
+
+            var resultOriginalUrl = service.getOriginalUrlForShortUrlToken("abcdef");
+
+            assertThat(resultOriginalUrl).isNotNull().isEqualTo("http://originalurl");
+            verify(mockShortUrlDao).findExistingShortUrlEntityByToken("abcdef");
+        }
+
+        @Test
+        @DisplayName("getOriginalUrlForShortUrlToken : if short url token is null, then findExistingShortUrlEntityByToken is not called and ShortUrlInvalidTokenException is thrown")
+        void getOriginalUrlForShortUrlToken_error_tokenIsNull() {
+            assertThatThrownBy(() -> service.getOriginalUrlForShortUrlToken(null))
+                    .isInstanceOf(ShortUrlInvalidTokenException.class)
+                    .hasFieldOrPropertyWithValue("token", null);
+        }
+
+        @Test
+        @DisplayName("getOriginalUrlForShortUrlToken : if short url token is empty, then findExistingShortUrlEntityByToken is not called and ShortUrlInvalidTokenException is thrown")
+        void getOriginalUrlForShortUrlToken_error_tokenIsEmpty() {
+            assertThatThrownBy(() -> service.getOriginalUrlForShortUrlToken(StringUtils.EMPTY))
+                    .isInstanceOf(ShortUrlInvalidTokenException.class)
+                    .hasFieldOrPropertyWithValue("token", StringUtils.EMPTY);
+        }
+
+        @Test
+        @DisplayName("getOriginalUrlForShortUrlToken : if short url token is blank, then findExistingShortUrlEntityByToken is not called and ShortUrlInvalidTokenException is thrown")
+        void getOriginalUrlForShortUrlToken_error_tokenIsBlank() {
+            assertThatThrownBy(() -> service.getOriginalUrlForShortUrlToken(StringUtils.SPACE))
+                    .isInstanceOf(ShortUrlInvalidTokenException.class)
+                    .hasFieldOrPropertyWithValue("token", StringUtils.SPACE);
+        }
+
+        @Test
+        @DisplayName("getOriginalUrlForShortUrlToken : if short url does not already exist, then findExistingShortUrlEntityByToken is called but ShortUrlTokenNotFoundException is thrown")
+        void getOriginalUrlForShortUrlToken_error_shortUrlDoesNotExist() {
+            when(mockShortUrlDao.findExistingShortUrlEntityByToken("abcdef")).thenReturn(null);
+
+            assertThatThrownBy(() -> service.getOriginalUrlForShortUrlToken("abcdef"))
+                    .isInstanceOf(ShortUrlTokenNotFoundException.class)
+                    .hasFieldOrPropertyWithValue("token", "abcdef");
+        }
+
+    }
+
 
     @Nested
     @DisplayName("UrlShortenerServiceImpl.findOrCreateShortUrlToken tests")
