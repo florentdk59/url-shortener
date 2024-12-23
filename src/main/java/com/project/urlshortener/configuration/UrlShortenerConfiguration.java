@@ -1,7 +1,9 @@
 package com.project.urlshortener.configuration;
 
+import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -19,6 +21,7 @@ import java.util.Locale;
  */
 @Configuration
 @EnableRetry
+@EnableConfigurationProperties(UrlShortenerProperties.class)
 @EnableEncryptableProperties
 public class UrlShortenerConfiguration implements WebMvcConfigurer {
 

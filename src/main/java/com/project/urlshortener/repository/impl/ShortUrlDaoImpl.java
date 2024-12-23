@@ -84,7 +84,6 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
             }
             throw new ShortUrlTokenCannotBeCreatedException(originalUrl);
         }
-        shortUrlToken = "aEb";
 
         if (urlTokensRepository.findByToken(shortUrlToken) != null) {
             // token already taken

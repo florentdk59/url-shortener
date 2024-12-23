@@ -22,8 +22,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Objects;
+
 import static com.project.urlshortener.common.exception.RequiredValueException.RequirementType.*;
-import static java.util.Objects.isNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -75,7 +76,10 @@ public class ShortUrlDaoImplTest {
             assertThatThrownBy(() -> shortUrlDaoImpl.findExistingShortUrlEntityByToken(nullOrEmpty))
                     .isInstanceOf(RequiredValueException.class)
                     .hasFieldOrPropertyWithValue("fieldName", "token")
-                    .hasFieldOrPropertyWithValue("requirementType", isNull(nullOrEmpty) ? CANNOT_BE_NULL : CANNOT_BE_EMPTY);
+                    .hasFieldOrPropertyWithValue("requirementType",
+                            Objects.isNull(nullOrEmpty) ? CANNOT_BE_NULL : CANNOT_BE_EMPTY);
+
+            verifyNoInteractions(mockUrlTokensRepository);
         }
 
         @Test
@@ -85,6 +89,8 @@ public class ShortUrlDaoImplTest {
                     .isInstanceOf(RequiredValueException.class)
                     .hasFieldOrPropertyWithValue("fieldName", "token")
                     .hasFieldOrPropertyWithValue("requirementType", CANNOT_BE_BLANK);
+
+            verifyNoInteractions(mockUrlTokensRepository);
         }
 
     }
@@ -114,7 +120,10 @@ public class ShortUrlDaoImplTest {
             assertThatThrownBy(() -> shortUrlDaoImpl.findExistingShortUrlEntityByOriginalUrl(nullOrEmpty))
                     .isInstanceOf(RequiredValueException.class)
                     .hasFieldOrPropertyWithValue("fieldName", "originalUrl")
-                    .hasFieldOrPropertyWithValue("requirementType", isNull(nullOrEmpty) ? CANNOT_BE_NULL : CANNOT_BE_EMPTY);
+                    .hasFieldOrPropertyWithValue("requirementType",
+                            Objects.isNull(nullOrEmpty) ? CANNOT_BE_NULL : CANNOT_BE_EMPTY);
+
+            verifyNoInteractions(mockUrlTokensRepository);
         }
 
         @Test
@@ -124,6 +133,8 @@ public class ShortUrlDaoImplTest {
                     .isInstanceOf(RequiredValueException.class)
                     .hasFieldOrPropertyWithValue("fieldName", "originalUrl")
                     .hasFieldOrPropertyWithValue("requirementType", CANNOT_BE_BLANK);
+
+            verifyNoInteractions(mockUrlTokensRepository);
         }
 
     }
@@ -174,6 +185,8 @@ public class ShortUrlDaoImplTest {
             assertThatThrownBy(() -> shortUrlDaoImpl.createNewShortUrlEntityRetryable("http://originalurl-fail"))
                     .isInstanceOf(ShortUrlTokenCannotBeCreatedException.class)
                     .hasFieldOrPropertyWithValue("originalUrl", "http://originalurl-fail");
+
+            verify(mockUrlTokensRepository, never()).save(any());
         }
 
         @Test
@@ -186,6 +199,8 @@ public class ShortUrlDaoImplTest {
                     .isInstanceOf(ShortUrlTokenAlreadyUsedException.class)
                     .hasFieldOrPropertyWithValue("shortUrlToken", "TOKEN")
                     .hasFieldOrPropertyWithValue("originalUrl", "http://originalurl-fail-token");
+
+            verify(mockUrlTokensRepository, never()).save(any());
         }
 
         private void using_mocked_urlTokensRepository_save() {

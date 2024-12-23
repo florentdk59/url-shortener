@@ -14,10 +14,15 @@ spring:
     console:
       enabled: true
 
+logging:
+  level:
+    org:
+      springframework: debug
+
 # urlshortener configuration
-urlshortener:
+url-shortener:
   baseurl: http://localhost:8080/
   token:
-    length: 10
+    length: 3
     characters: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
-    maxattempts: 5
+    max-attempts: 5
