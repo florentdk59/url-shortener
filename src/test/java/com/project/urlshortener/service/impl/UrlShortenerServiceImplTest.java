@@ -266,39 +266,6 @@ public class UrlShortenerServiceImplTest {
                     .hasFieldOrPropertyWithValue("requirementType", CANNOT_BE_BLANK);
         }
 
-        @Test
-        @DisplayName("buildShortUrlForToken : if baseUrl is null, then RequiredValueException")
-        void buildShortUrlForToken_error_baseUrlIsNull() {
-            givenBaseUrl(null);
-
-            assertThatThrownBy(() -> service.buildShortUrlForToken("token"))
-                    .isInstanceOf(RequiredValueException.class)
-                    .hasFieldOrPropertyWithValue("fieldName", "urlShortenerProperties.baseUrl()")
-                    .hasFieldOrPropertyWithValue("requirementType", CANNOT_BE_NULL);
-        }
-
-        @Test
-        @DisplayName("buildShortUrlForToken : if baseUrl is empty, then RequiredValueException")
-        void buildShortUrlForToken_error_baseUrlIsEmpty() {
-            givenBaseUrl(StringUtils.EMPTY);
-
-            assertThatThrownBy(() -> service.buildShortUrlForToken("mytoken"))
-                    .isInstanceOf(RequiredValueException.class)
-                    .hasFieldOrPropertyWithValue("fieldName", "urlShortenerProperties.baseUrl()")
-                    .hasFieldOrPropertyWithValue("requirementType", CANNOT_BE_EMPTY);
-        }
-
-        @Test
-        @DisplayName("buildShortUrlForToken : if baseUrl is blank, then RequiredValueException")
-        void buildShortUrlForToken_error_baseUrlIsBlank() {
-            givenBaseUrl(StringUtils.SPACE);
-
-            assertThatThrownBy(() -> service.buildShortUrlForToken("mytoken"))
-                    .isInstanceOf(RequiredValueException.class)
-                    .hasFieldOrPropertyWithValue("fieldName", "urlShortenerProperties.baseUrl()")
-                    .hasFieldOrPropertyWithValue("requirementType", CANNOT_BE_BLANK);
-        }
-
     }
 
 

@@ -1,6 +1,5 @@
 package com.project.urlshortener.repository.impl;
 
-import com.project.urlshortener.common.utils.ArgumentUtils;
 import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.project.urlshortener.exception.ShortUrlTokenAlreadyUsedException;
 import com.project.urlshortener.exception.ShortUrlTokenCannotBeCreatedException;
@@ -13,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+
+import static com.project.urlshortener.common.utils.ArgumentUtils.requireNonBlank;
 
 /**
  * Manipulates ShortUrlRepository to access the database.<br/>
@@ -46,7 +47,7 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
      */
     @Override
     public ShortUrlEntity findExistingShortUrlEntityByToken(final String token) {
-        ArgumentUtils.requireNonBlank(token, "token");
+        requireNonBlank(token, "token");
 
         return urlTokensRepository.findByToken(token);
     }
@@ -59,7 +60,7 @@ public class ShortUrlDaoImpl implements ShortUrlDao {
      */
     @Override
     public ShortUrlEntity findExistingShortUrlEntityByOriginalUrl(final String originalUrl) {
-        ArgumentUtils.requireNonBlank(originalUrl, "originalUrl");
+        requireNonBlank(originalUrl, "originalUrl");
 
         return urlTokensRepository.findByOriginalUrl(originalUrl);
     }

@@ -1,6 +1,5 @@
 package com.project.urlshortener.service.impl;
 
-import com.project.urlshortener.common.utils.ArgumentUtils;
 import com.project.urlshortener.service.StringTokenService;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +7,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 import java.util.stream.Collector;
+
+import static com.project.urlshortener.common.utils.ArgumentUtils.requireNonBlank;
+import static com.project.urlshortener.common.utils.ArgumentUtils.requireStrictlyPositiveValue;
 
 /**
  * Service to create tokens of random characters.<br/>
@@ -32,8 +34,8 @@ public class StringTokenServiceImpl implements StringTokenService {
 
     @Override
     public String createStringToken(final String availableCharacters, final int nbCharacters) {
-        ArgumentUtils.requireNonBlank(availableCharacters, "availableCharacters");
-        ArgumentUtils.requireStrictlyPositiveValue(nbCharacters, "nbCharacters");
+        requireNonBlank(availableCharacters, "availableCharacters");
+        requireStrictlyPositiveValue(nbCharacters, "nbCharacters");
 
         return random.ints(nbCharacters, 0, availableCharacters.length())
                     .mapToObj(availableCharacters::charAt)

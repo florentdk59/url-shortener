@@ -1,6 +1,5 @@
 package com.project.urlshortener.service.impl;
 
-import com.project.urlshortener.common.utils.ArgumentUtils;
 import com.project.urlshortener.configuration.properties.UrlShortenerProperties;
 import com.project.urlshortener.exception.*;
 import com.project.urlshortener.model.entities.ShortUrlEntity;
@@ -12,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static com.project.urlshortener.common.utils.ArgumentUtils.requireNonBlank;
 
 /**
  * Service to control the creation of short urls and the retrieval of complete urls.<br/>
@@ -46,7 +47,6 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
 
     @Override
     public String obtainShortUrlForOriginalCompleteUrl(final String originalUrl) throws ShortUrlInvalidUrlException {
-        ArgumentUtils.requireNonBlank(originalUrl, "originalUrl");
 
         // validate the url
         if (!isUrlValid(originalUrl)) {
@@ -56,7 +56,7 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
         try {
             // obtain the token
             String shortUrlToken = findOrCreateShortUrlToken(originalUrl);
-            ArgumentUtils.requireNonBlank(shortUrlToken, "shortUrlToken");
+            requireNonBlank(shortUrlToken, "shortUrlToken");
 
             // build the url
             return buildShortUrlForToken(shortUrlToken);
@@ -88,9 +88,7 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
      * @return a short url token
      */
     protected String findOrCreateShortUrlToken(final String originalUrl) {
-        ArgumentUtils.requireNonBlank(originalUrl, "originalUrl");
-        ArgumentUtils.requireNonBlank(urlShortenerProperties.token().characters(), "urlShortenerProperties.token().characters()");
-        ArgumentUtils.requireStrictlyPositiveValue(urlShortenerProperties.token().length(), "urlShortenerProperties.token().length()");
+        requireNonBlank(originalUrl, "originalUrl");
 
         // search in the database for the token if it already exists for this url?
         // OR create a new token if there wasn't already one
@@ -109,8 +107,7 @@ public class UrlShortenerServiceImpl implements UrlShortenerService  {
      * @return the final short url, with the base url and the token together.
      */
     protected String buildShortUrlForToken(final String shortUrlToken) {
-        ArgumentUtils.requireNonBlank(shortUrlToken, "shortUrlToken");
-        ArgumentUtils.requireNonBlank(urlShortenerProperties.baseUrl(), "urlShortenerProperties.baseUrl()");
+        requireNonBlank(shortUrlToken, "shortUrlToken");
 
         String baseUrl = urlShortenerProperties.baseUrl();
         if (!baseUrl.endsWith("/")) {
